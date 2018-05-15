@@ -47,6 +47,17 @@ const getDateStr = () => {
   }`
 }
 
+/**
+ * Handle trailing slashes.
+ *
+ * @param {String} url
+ * @return {String}
+ */
+const normalizeURL = url => {
+  const final = url.split('/').find((str, idx, arr) => arr.length - 1 === idx)
+  return final.length > 0 && final.indexOf('?') !== 0 ? url + '/' : url
+}
+
 const server = micro(
   cors(async (req, res) => {
     const [, queryStr] = req.url.split('/?')
@@ -55,10 +66,11 @@ const server = micro(
       case req.headers.origin === ALLOWED_ORIGIN && Boolean(parsed.url): {
         try {
           const dateStr = getDateStr()
-          asyncIncr(parsed.url)
-          asyncIncr(`${dateStr}:${parsed.url}`)
+          const url = normalizeURL(parsed.url)
+          asyncIncr(url)
+          asyncIncr(`${dateStr}:${url}`)
           asyncIncr('overallTotal')
-          asyncSadd('overallUrls', parsed.url)
+          asyncSadd('overallUrls', url)
           asyncSadd('overallDates', dateStr)
           return 'ok'
         } catch (err) {
@@ -69,10 +81,18 @@ const server = micro(
       default: {
         try {
           const urls = await asyncSmembers('overallUrls')
+          const reducedURLs = urls.reduce(
+            (acc, url) =>
+              acc.includes(normalizeURL(url))
+                ? acc
+                : [...acc, normalizeURL(url)],
+            []
+          )
           const dates = await asyncSmembers('overallDates')
           const byDate = dates.reduce(async (acc, date) => {
+            acc = await acc
             const results = Promise.all(
-              urls.map(async url => ({
+              reducedURLs.map(async url => ({
                 total: parseInt(await asyncGet(`${date}:${url}`), 10),
                 date,
                 url
@@ -81,7 +101,7 @@ const server = micro(
             return [...acc, ...(await results)]
           }, [])
           const byUrl = Promise.all(
-            urls.map(async url => ({
+            reducedURLs.map(async url => ({
               url,
               total: parseInt(await asyncGet(url), 10)
             }))

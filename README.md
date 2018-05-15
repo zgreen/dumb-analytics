@@ -1,10 +1,10 @@
 # dumb-analytics
 
-This is a simple analytics server, backed by redis. You might use it if
+This is a simple analytics server, backed by redis. You might use it if:
 
 * you want your analytics to be very simple
 * you want your analytics to be open
-* you distrust or are wary of Google's approach to user privacy and data collection
+* you distrust, or are wary of, Google's approach to user privacy and data collection
 
 ## Install
 
@@ -56,3 +56,14 @@ The shape of the data will be:
 * `byDate` is an array of objects grouped by URL and date.
 * `byURL` is an array of objects with the overall visit total per URL.
 * `total` is the total number of visits to the site.
+
+## Example
+
+This example loads environment variables using [dotenv](https://www.npmjs.com/package/dotenv).
+
+```js
+// server.js
+require('dotenv').config()
+const server = require('dumb-analytics')
+server.listen(3000, () => console.log('Server listening...'))
+```
