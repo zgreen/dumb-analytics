@@ -24,10 +24,13 @@ This package requires a redis server to work. The following environment variable
 
 ### The server
 
+This example loads environment variables using [dotenv](https://www.npmjs.com/package/dotenv).
+
 ```js
 // server.js
-const dumbAnalytics = require('dumb-analytics')
-dumbAnalytics.listen(3000)
+require('dotenv').config()
+const server = require('dumb-analytics')
+server.listen(3000, () => console.log('Server listening...'))
 ```
 
 ### Updating analytics from the client
@@ -56,14 +59,3 @@ The shape of the data will be:
 * `byDate` is an array of objects grouped by URL and date.
 * `byURL` is an array of objects with the overall visit total per URL.
 * `total` is the total number of visits to the site.
-
-## Example
-
-This example loads environment variables using [dotenv](https://www.npmjs.com/package/dotenv).
-
-```js
-// server.js
-require('dotenv').config()
-const server = require('dumb-analytics')
-server.listen(3000, () => console.log('Server listening...'))
-```
