@@ -18,7 +18,7 @@
   "dependencies": {
     "micro": "^9.3.0",
     "micro-cors": "^0.1.0",
-    "redis": "^2.8.0"
+    "redis": "^3.1.1"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
